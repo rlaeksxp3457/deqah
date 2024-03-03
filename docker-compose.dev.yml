@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: "on-failure"
+    ports:
+      - "80:80"
+    networks:
+      - deqha-network
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./frontend/build:/usr/share/nginx/html
+
+  deqha_db:
+    image: mysql:latest
+    restart: always
+    container_name: deqha_db
+    environment:
+      MYSQL_PASSWORD : ${DB_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: deqha
+      MYSQL_AUTHENTICATION_PLUGIN: caching_sha2_password
+    ports:
+      - "4306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - deqha-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "--silent" ]
+      interval: 5s
+      timeout: 1s
+      retries: 10
+
+  deqha_gateway:
+    build:
+      context: ./backend/
+    container_name: deqha_gateway
+    restart: "on-failure"
+    ports:
+      - "8080:8080"
+    volumes:
+      - './backend:/app'
+      - './backend/node_modules:/app/node_modules'
+    depends_on:
+      - deqha_db
+      - redis
+    networks:
+      - deqha-network
+    env_file:
+      - .env
+    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run dev"
+    stdin_open: true
+    tty: true
+
+#  frontend:
+#    build:
+#      context: ./frontend/
+#    container_name: frontend
+#    restart: "on-failure"
+#    ports:
+#      - "8000:8000"
+#    volumes:
+#      - './frontend:/app'
+#      - '/app/node_modules'
+#    command: sh -c "npm install && npm run start"
+#      - NODE_ENV=development
+#      - CHOKIDAR_USEPOLLING=true
+#    networks:
+#      - deqha-network
+#    stdin_open: true
+#    tty: true
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "7379:6379"
+    volumes:
+      - ./redis/data:/data
+      - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    networks:
+      - deqha-network
+    restart: always
+    command: redis-server /usr/local/conf/redis.conf
+
+volumes:
+  db-data:
+  media:
+
+networks:
+  deqha-network:
