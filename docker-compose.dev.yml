@@ -11,16 +11,15 @@ services:
       - deqha-network
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./frontend/build:/usr/share/nginx/html
 
-  deqha_db:
+  deqah_db:
     image: mysql:latest
     restart: always
-    container_name: deqha_db
+    container_name: deqah_db
     environment:
       MYSQL_PASSWORD : ${DB_ROOT_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: deqha
+      MYSQL_DATABASE: deqah
       MYSQL_AUTHENTICATION_PLUGIN: caching_sha2_password
     ports:
       - "4306:3306"
@@ -34,44 +33,44 @@ services:
       timeout: 1s
       retries: 10
 
-  deqha_gateway:
+#  deqha_gateway:
+#    build:
+#      context: ./backend/
+#    container_name: deqha_gateway
+#    restart: "on-failure"
+#    ports:
+#      - "8080:8080"
+#    volumes:
+#      - './backend:/app'
+#      - './backend/node_modules:/app/node_modules'
+#    depends_on:
+#      - deqha_db
+#      - redis
+#    networks:
+#      - deqha-network
+#    env_file:
+#      - .env
+#    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run dev"
+#    stdin_open: true
+#    tty: true
+
+  deqah_frontend:
     build:
-      context: ./backend/
-    container_name: deqha_gateway
+      context: ./frontend/
+    container_name: deqah_frontend
     restart: "on-failure"
     ports:
-      - "8080:8080"
+      - "3000:3000"
     volumes:
-      - './backend:/app'
-      - './backend/node_modules:/app/node_modules'
-    depends_on:
-      - deqha_db
-      - redis
+      - './frontend:/app'
+      - '/app/node_modules'
+    command: sh -c "npm run start:${NODE_ENV}"
     networks:
       - deqha-network
     env_file:
       - .env
-    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run dev"
     stdin_open: true
     tty: true
-
-#  frontend:
-#    build:
-#      context: ./frontend/
-#    container_name: frontend
-#    restart: "on-failure"
-#    ports:
-#      - "8000:8000"
-#    volumes:
-#      - './frontend:/app'
-#      - '/app/node_modules'
-#    command: sh -c "npm install && npm run start"
-#      - NODE_ENV=development
-#      - CHOKIDAR_USEPOLLING=true
-#    networks:
-#      - deqha-network
-#    stdin_open: true
-#    tty: true
 
   redis:
     image: redis:latest

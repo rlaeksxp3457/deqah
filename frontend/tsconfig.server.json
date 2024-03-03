@@ -8,7 +8,7 @@
     "typeRoots": ["node_modules/@types"],
     "moduleResolution": "node",
     "rootDir": "./src",
-    "outDir": "./dist",
+    "outDir": ".next/backend/",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -25,7 +25,7 @@
     }
   },
   // 어디에 있는 파일을 컴파일 할 것인지
-  "include": ["src/**/*.ts", "src/**/*.json", ".env"],
+  "include": ["src/server/**/*.ts", "src/server/**/*.json", ".env"],
   // 컴파일에서 제외되는 파일들
   "exclude": [
     "node_modules",
