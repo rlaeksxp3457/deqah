@@ -8,7 +8,7 @@
     "typeRoots": ["node_modules/@types"],
     "moduleResolution": "node",
     "rootDir": "./src",
-    "outDir": ".next/backend/",
+    "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -19,16 +19,16 @@
     "emitDecoratorMetadata": true,
     "sourceMap": true,
     "importHelpers": true,
-    "baseUrl": "src",
+    "baseUrl": "./src",
     "paths": {
-      "@/*": ["*"],
+      "@/*": ["*"]
     }
   },
   // 어디에 있는 파일을 컴파일 할 것인지
-  "include": ["src/server/**/*.ts", "src/server/**/*.json", ".env"],
+  "include": ["src/**/*.ts", "src/**/*.json", ".env"],
   // 컴파일에서 제외되는 파일들
   "exclude": [
-    "node_modules",
+    "../backend/node_modules",
     "**/*.spec.ts",
     "logs"
   ]
