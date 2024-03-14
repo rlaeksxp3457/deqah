@@ -9,8 +9,50 @@ services:
       - "80:80"
     networks:
       - deqah-network
+      - deqah-user-service-network
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./frontend/build:/usr/share/nginx/html
+
+  deqah_frontend:
+    build:
+      context: ./frontend/
+    container_name: deqah_frontend
+    restart: "on-failure"
+    ports:
+      - "3000:3000"
+    volumes:
+      - './frontend:/app'
+      - './frontend/node_modules:/app/node_modules'
+    command: sh -c "npm install && npm run start:${NODE_ENV}"
+    networks:
+      - deqah-network
+    env_file:
+      - .env
+    stdin_open: true
+    tty: true
+
+# Auth Service
+  deqah_auth_service:
+    build:
+      context: ./auth_service/
+    container_name: deqah_auth_service
+    restart: "on-failure"
+    ports:
+      - "8080:8080"
+    volumes:
+      - './auth_service:/app'
+      - './auth_service/node_modules:/app/node_modules'
+    depends_on:
+      - deqah_db
+      - deqah_redis
+    networks:
+      - deqah-network
+    env_file:
+      - .env
+    command: sh -c "npm run start:${NODE_ENV}"
+    stdin_open: true
+    tty: true
 
   deqah_db:
     image: mysql:latest
@@ -33,45 +75,45 @@ services:
       timeout: 1s
       retries: 10
 
-  deqha_gateway:
+  ## User Service
+  deqah_user_service:
     build:
-      context: ./backend/
-    container_name: deqha_gateway
+      context: ./user_service/
+    container_name: deqah_user_service
     restart: "on-failure"
     ports:
-      - "8080:8080"
+      - "8081:8081"
+    env_file:
+      - .env
+    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:${NODE_ENV}"
     volumes:
-      - './backend:/app'
-      - './backend/node_modules:/app/node_modules'
+      - './user_service:/app'
+      - './user_service/node_modules:/app/node_modules'
     depends_on:
-      - deqah_db
-      - deqah_redis
+      - deqah_user_db
     networks:
-      - deqah-network
-    env_file:
-      - .env
-#    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run dev"
-    command: sh -c "npm run start:${NODE_ENV}"
-    stdin_open: true
-    tty: true
+      - deqah-user-service-network
 
-  deqah_frontend:
-    build:
-      context: ./frontend/
-    container_name: deqah_frontend
-    restart: "on-failure"
+  deqah_user_db:
+    image: mysql:latest
+    restart: always
+    container_name: deqah_user_db
+    environment:
+      MYSQL_PASSWORD : ${DB_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: deqah_user_service
+      MYSQL_AUTHENTICATION_PLUGIN: caching_sha2_password
     ports:
-      - "3000:3000"
+      - "4307:3306"
     volumes:
-      - './frontend:/app'
-      - './frontend/node_modules:/app/node_modules'
-    command: sh -c "npm run start:${NODE_ENV}"
+      - user-db:/var/lib/mysql
     networks:
-      - deqah-network
-    env_file:
-      - .env
-    stdin_open: true
-    tty: true
+      - deqah-user-service-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "--silent" ]
+      interval: 5s
+      timeout: 1s
+      retries: 10
 
   deqah_redis:
     image: redis:latest
@@ -91,7 +133,9 @@ services:
 
 volumes:
   db-data:
+  user-db:
   media:
 
 networks:
   deqah-network:
+  deqah-user-service-network:

@@ -28,7 +28,7 @@
   "include": ["src/**/*.ts", "src/**/*.json", ".env"],
   // 컴파일에서 제외되는 파일들
   "exclude": [
-    "../backend/node_modules",
+    "../auth_service/node_modules",
     "**/*.spec.ts",
     "logs"
   ]
