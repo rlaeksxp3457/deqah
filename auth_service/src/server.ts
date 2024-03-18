@@ -1,7 +1,7 @@
-import {app} from "./app";
+import { app } from './app';
 
-const { GATEWAY_SERVICE_PORT } = process.env;
+const { AUTH_SERVICE_PORT } = process.env;
 
-app.listen(GATEWAY_SERVICE_PORT, () => {
-  console.log(`Auth-Server is running on port ${GATEWAY_SERVICE_PORT}`);
+app.listen(AUTH_SERVICE_PORT, () => {
+  console.log(`Auth-Server is running on port ${AUTH_SERVICE_PORT}`);
 });

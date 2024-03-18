@@ -9,7 +9,6 @@ services:
       - "80:80"
     networks:
       - deqah-network
-      - deqah-user-service-network
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./frontend/build:/usr/share/nginx/html
@@ -92,7 +91,7 @@ services:
     depends_on:
       - deqah_user_db
     networks:
-      - deqah-user-service-network
+      - deqah-network
 
   deqah_user_db:
     image: mysql:latest
@@ -108,7 +107,7 @@ services:
     volumes:
       - user-db:/var/lib/mysql
     networks:
-      - deqah-user-service-network
+      - deqah-network
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "--silent" ]
       interval: 5s
@@ -138,4 +137,3 @@ volumes:
 
 networks:
   deqah-network:
-  deqah-user-service-network:
