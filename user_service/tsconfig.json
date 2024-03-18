@@ -7,7 +7,7 @@
     "module": "commonjs",
     "typeRoots": ["node_modules/@types"],
     "moduleResolution": "node",
-    "rootDir": "./src",
+    "rootDir": ".",
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
@@ -19,16 +19,16 @@
     "emitDecoratorMetadata": true,
     "sourceMap": true,
     "importHelpers": true,
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["./src/*"]
     }
   },
   // 어디에 있는 파일을 컴파일 할 것인지
   "include": ["src/**/*.ts", "src/**/*.json", ".env"],
   // 컴파일에서 제외되는 파일들
   "exclude": [
-    "../auth_service/node_modules",
+    "./node_modules",
     "**/*.spec.ts",
     "logs"
   ]

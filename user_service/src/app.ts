@@ -1,17 +1,13 @@
-import express, {Request, Response} from "express";
-import morgan from "morgan";
+import express from 'express';
+import Loader from './loader/loader';
 
 const app = express();
 
-app.use(morgan("dev"));
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+(async () => {
+  await Loader(app);
+})();
 
-app.get("/", (_: Request, res: Response) => {
-  res.send("welcome to user service!");
-});
-
-export {app}
+export { app };
 
 // 페이지접근 > 로그인 여부를 검사 > 로그인 페이지로 이동 > 깃허브, 구글 ... 소셜로그인 버튼
 // > 구글, 네이버 > 네이버 로그인 url 로 이동 > 로그인
