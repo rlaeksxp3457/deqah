@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 export default function SignUp() {
-  const [data, setData] = useState({
+  const [data] = useState({
     sns_id: 'b23ab277958b1d2783b8b27e417db0c57b71340b0c17ffacecd861deecb66e5e',
     email: 'rlaeksxp3457@naver.com',
     nickname: 'rlaeksxp3457',

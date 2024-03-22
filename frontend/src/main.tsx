@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Login from './pages/Login/Login.tsx';
 import AuthBase from './pages/AuthBase/AuthBase.tsx';
 import SignUp from './pages/SignUp/SignUp.tsx';
+import SelectRole from './pages/SelectRole/SelectRole.tsx';
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,11 @@ const router = createBrowserRouter([
       { path: 'login', element: <Login /> },
       { path: 'signup', element: <SignUp /> },
     ],
+  },
+  {
+    path: '/select-role',
+    element: <SelectRole />,
+    errorElement: <div>sorry, not found 404</div>,
   },
 ]);
 
