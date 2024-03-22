@@ -4,6 +4,7 @@ import { Strategy as NaverStrategy, Profile as NaverProfile } from 'passport-nav
 import crypto from 'crypto';
 import axios, { AxiosResponse } from 'axios';
 import jwt from 'jsonwebtoken';
+import { randomColor, randomColorShade } from '../utils/func';
 
 export const passportLoader = async (passport: PassportStatic) => {
   const { naver, JWT } = config;
@@ -31,13 +32,26 @@ export const passportLoader = async (passport: PassportStatic) => {
 
           if (status === 200) {
             const token = generateToken(data.user_id);
-            done(null, token);
+            done(null, token, 'login');
           }
         } catch (err: any) {
           if (err.response.status === 404) {
-            const { data } = await axios.post('http://deqah_user_service:8081/api/user', { sns_id, email });
-            const token = generateToken(data.user.id);
-            done(null, token);
+            const { data, status } = await axios.post('http://deqah_verify_service:8082/api/verify/token', {
+              key: sns_id,
+              value: {
+                sns_id,
+                email,
+                nickname: email && email.split('@')[0],
+                profile: { initial: email && email[0].toUpperCase(), color: randomColor(), shade: randomColorShade() },
+              },
+              expire: 600,
+            });
+            if (status === 200) {
+              done(null, sns_id, 'not found');
+            }
+            if (status === 500) {
+              done(null, false);
+            }
           }
           done(null, false);
         }
