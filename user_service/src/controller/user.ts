@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { body } from '../types/request';
 import UserService from '../service/user';
 
 export default class UserController {
@@ -30,8 +31,8 @@ export default class UserController {
 
   createUser = async (req: Request, res: Response) => {
     try {
-      const { email, sns_id } = req.body;
-      const user = await this.userService.createUser({ email, sns_id });
+      const { email, sns_id, nickname, profile }: body = req.body;
+      const user = await this.userService.createUser(email, sns_id, nickname, profile);
 
       res.status(201).json({ message: 'success', user });
     } catch (error: any) {

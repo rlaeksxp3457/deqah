@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { Profile } from '../types/request';
 
 export default class UserService {
   private prisma: PrismaClient;
@@ -6,14 +7,21 @@ export default class UserService {
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
   }
-  createUser = async (data: any) => {
+  createUser = async (email: string, sns_id: string, nickname: string, profile: Profile) => {
     return this.prisma.user.create({
       data: {
-        sns_id: data.sns_id,
-        email: data.email,
+        sns_id: sns_id,
+        email: email,
         profile: {
           create: {
-            image: `${data.email[0]}`,
+            nickname: nickname,
+            profileImage: {
+              create: {
+                initial: profile.initial,
+                color: profile.color,
+                shade: profile.shade,
+              },
+            },
           },
         },
       },
